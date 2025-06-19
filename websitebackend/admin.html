@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Admin</title>
+    <style>
+        :root {
+            --primary-color: #f8f9fa;
+            --secondary-color: #6c757d;
+            --accent-color: #ff8c00;
+            --text-color: #333;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--primary-color);
+            padding: 20px;
+        }
+        
+        h1, h2 {
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .admin-section {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        button {
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #e67e00;
+        }
+        
+        .preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+        }
+        
+        .project-list,
+        .service-list {
+            margin-top: 1rem;
+        }
+        
+        .project-item,
+        .service-item {
+            padding: 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .project-item button,
+        .service-item button {
+            background-color: #dc3545;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Portfolio Admin Panel</h1>
+        
+        <div class="admin-section">
+            <h2>Update About Section</h2>
+            <form id="about-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="profile-image">Profile Image</label>
+                    <input type="file" id="profile-image" name="profileImage" accept="image/*">
+                </div>
+                <button type="submit">Update About Section</button>
+            </form>
+        </div>
+        
+        <div class="admin-section">
+            <h2>Manage Services</h2>
+            <form id="service-form">
+                <div class="form-group">
+                    <label for="service-title">Service Title</label>
+                    <input type="text" id="service-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="service-icon">Icon (Font Awesome class)</label>
+                    <input type="text" id="service-icon" name="icon" placeholder="fa-code" required>
+                </div>
+                <div class="form-group">
+                    <label for="service-description">Description</label>
+                    <textarea id="service-description" name="description" rows="3" required></textarea>
+                </div>
+                <button type="submit">Add Service</button>
+            </form>
+            
+            <div class="service-list">
+                <h3>Current Services</h3>
+                <!-- Services will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div class="admin-section">
+            <h2>Manage Projects</h2>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="project-title">Project Title</label>
+                    <input type="text" id="project-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Description</label>
+                    <textarea id="project-description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-image">Project Image</label>
+                    <input type="file" id="project-image" name="image" accept="image/*" required>
+                </div>
+                <button type="submit">Add Project</button>
+            </form>
+            
+            <div class="project-list">
+                <h3>Current Projects</h3>
+                <!-- Projects will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const aboutForm = document.getElementById('about-form');
+            const serviceForm = document.getElementById('service-form');
+            const projectForm = document.getElementById('project-form');
+            const serviceList = document.querySelector('.service-list');
+            const projectList = document.querySelector('.project-list');
+            
+            // Sample data (in a real app, you would fetch this from your backend)
+            const services = [
+                { id: 1, title: 'Web Development', icon: 'fa-code', description: 'Custom websites built with the latest technologies' },
+                { id: 2, title: 'Mobile Apps', icon: 'fa-mobile-alt', description: 'Native and cross-platform mobile applications' }
+            ];
+            
+            const projects = [
+                { id: 1, title: 'E-commerce Platform', description: 'A full-featured online store with payment integration', imagePath: '../websiteimages/project1.jpg' },
+                { id: 2, title: 'Portfolio Website', description: 'Responsive portfolio for a professional photographer', imagePath: '../websiteimages/project2.jpg' }
+            ];
+            
+            // Render initial data
+            renderServices();
+            renderProjects();
+            
+            // Handle about form submission
+            if (aboutForm) {
+                aboutForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData();
+                    formData.append('name', document.getElementById('name').value);
+                    formData.append('bio', document.getElementById('bio').value);
+                    
+                    const profileImage = document.getElementById('profile-image').files[0];
+                    if (profileImage) {
+                        formData.append('profileImage', profileImage);
+                    }
+                    
+                    // In a real app, you would send this to your backend
+                    console.log('About form submitted');
+                    
+                    // Simulate successful update
+                    alert('About section updated successfully!');
+                });
+            }
+            
+            // Handle service form submission
+            if (serviceForm) {
+                serviceForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const newService = {
+                        id: services.length + 1,
+                        title: document.getElementById('service-title').value,
+                        icon: document.getElementById('service-icon').value,
+                        description: document.getElementById('service-description').value
+                    };
+                    
+                    // In a real app, you would send this to your backend
+                    services.push(newService);
+                    renderServices();
+                    
+                    // Reset form
+                    serviceForm.reset();
+                });
+            }
+            
+            // Handle project form submission
+            if (projectForm) {
+                projectForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData();
+                    formData.append('title', document.getElementById('project-title').value);
+                    formData.append('description', document.getElementById('project-description').value);
+                    
+                    const projectImage = document.getElementById('project-image').files[0];
+                    if (projectImage) {
+                        formData.append('image', projectImage);
+                    }
+                    
+                    // In a real app, you would send this to your backend
+                    const newProject = {
+                        id: projects.length + 1,
+                        title: document.getElementById('project-title').value,
+                        description: document.getElementById('project-description').value,
+                        imagePath: projectImage ? URL.createObjectURL(projectImage) : ''
+                    };
+                    
+                    projects.push(newProject);
+                    renderProjects();
+                    
+                    // Reset form
+                    projectForm.reset();
+                });
+            }
+            
+            // Render services
+            function renderServices() {
+                serviceList.innerHTML = '<h3>Current Services</h3>';
+                
+                services.forEach(service => {
+                    const serviceItem = document.createElement('div');
+                    serviceItem.className = 'service-item';
+                    serviceItem.innerHTML = `
+                        <div>
+                            <strong>${service.title}</strong> - <i class="fas ${service.icon}"></i>
+                            <p>${service.description}</p>
+                        </div>
+                        <button class="delete-service" data-id="${service.id}">Delete</button>
+                    `;
+                    serviceList.appendChild(serviceItem);
+                });
+                
+                // Add delete event listeners
+                document.querySelectorAll('.delete-service').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const index = services.findIndex(service => service.id === id);
+                        if (index !== -1) {
+                            services.splice(index, 1);
+                            renderServices();
+                        }
+                    });
+                });
+            }
+            
+            // Render projects
+            function renderProjects() {
+                projectList.innerHTML = '<h3>Current Projects</h3>';
+                
+                projects.forEach(project => {
+                    const projectItem = document.createElement('div');
+                    projectItem.className = 'project-item';
+                    projectItem.innerHTML = `
+                        <div>
+                            <strong>${project.title}</strong>
+                            <p>${project.description}</p>
+                            ${project.imagePath ? `<img src="${project.imagePath}" alt="${project.title}" style="max-width: 100px; margin-top: 10px;">` : ''}
+                        </div>
+                        <button class="delete-project" data-id="${project.id}">Delete</button>
+                    `;
+                    projectList.appendChild(projectItem);
+                });
+                
+                // Add delete event listeners
+                document.querySelectorAll('.delete-project').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const index = projects.findIndex(project => project.id === id);
+                        if (index !== -1) {
+                            projects.splice(index, 1);
+                            renderProjects();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

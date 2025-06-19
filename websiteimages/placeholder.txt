@@ -1,0 +1,12 @@
+This directory should contain the following images:
+
+1. slide1.jpg - Header carousel image 1
+2. slide2.jpg - Header carousel image 2
+3. slide3.jpg - Header carousel image 3
+4. profile.jpg - About section profile picture (oval shaped)
+5. project1.jpg - Project showcase image 1
+6. project2.jpg - Project showcase image 2
+7. project3.jpg - Project showcase image 3
+8. cv.pdf - Downloadable CV file
+
+You can replace these with your own images.

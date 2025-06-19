@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Let's Build in Cloud </title>
+    <link rel="stylesheet" href="../websitecss/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#" target="_blank">
+                <img src="../websiteimages/CloudLogo.png" alt="Company Logo">
+            </a>
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#services">What I do</a></li>
+            <li><a href="#about">Who I am</a></li>
+            <li><a href="#projects">What I have achieved</a></li>
+            <li><a href="#contact">Get in touch</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header Section with Carousel -->
+    <header class="header">
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="../websiteimages/slide1.jpg" alt="Slide 1">
+                    <div class="carousel-caption">
+                        <h2>Welcome to My Portfolio</h2>
+                        <p>Creating innovative solutions for your needs</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="../websiteimages/slide2.jpg" alt="Slide 2">
+                    <div class="carousel-caption">
+                        <h2>Creative Design</h2>
+                        <p>Turning ideas into reality</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="../websiteimages/slide3.jpg" alt="Slide 3">
+                    <div class="carousel-caption">
+                        <h2>Professional Development</h2>
+                        <p>Building solutions that work</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control prev">&lt;</button>
+            <button class="carousel-control next">&gt;</button>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <h2 class="section-title">What I do</h2>
+        <div class="services-grid">
+            <div class="service-card" onclick="openServiceModal('cloud-engineering')">
+                <i class="fas fa-code"></i>
+                <h3>Cloud Engineering</h3>
+                <p>Custom websites built with the latest technologies</p>
+            </div>
+            <div class="service-card" onclick="openServiceModal('speaking')">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Speaking engagements</h3>
+                <p>Native and cross-platform mobile applications</p>
+            </div>
+            <div class="service-card" onclick="openServiceModal('ui-ux')">
+                <i class="fas fa-paint-brush"></i>
+                <h3>UI/UX Design</h3>
+                <p>User-centered design that enhances experience</p>
+            </div>
+            <div class="service-card" onclick="openServiceModal('data-engineering')">
+                <i class="fas fa-server"></i>
+                <h3>Data Engineering</h3>
+                <p>Robust server-side solutions and APIs</p>
+            </div>
+            <div class="service-card" onclick="openServiceModal('technical-writing')">
+                <i class="fas fa-search"></i>
+                <h3>Technical writing</h3>
+                <p>Improve your visibility in search engines</p>
+            </div>
+            <div class="service-card" onclick="openServiceModal('devops')">
+                <i class="fas fa-chart-line"></i>
+                <h3>DevOps</h3>
+                <p>Data-driven insights to grow your business</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Modal -->
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-carousel">
+                <div class="modal-carousel-inner">
+                    <div class="modal-slide active">
+                        <img src="https://via.placeholder.com/600x300" alt="Project 1">
+                    </div>
+                    <div class="modal-slide">
+                        <img src="https://via.placeholder.com/600x300" alt="Project 2">
+                    </div>
+                    <div class="modal-slide">
+                        <img src="https://via.placeholder.com/600x300" alt="Project 3">
+                    </div>
+                </div>
+                <button class="modal-control prev">&lt;</button>
+                <button class="modal-control next">&gt;</button>
+            </div>
+            <div class="modal-description">
+                <div class="description-slide active">
+                    <h3>Project Title 1</h3>
+                    <p>This is a detailed description of the first project. It showcases the skills and technologies used in this particular work.</p>
+                </div>
+                <div class="description-slide">
+                    <h3>Project Title 2</h3>
+                    <p>This is a detailed description of the second project. It highlights different aspects and achievements of this work.</p>
+                </div>
+                <div class="description-slide">
+                    <h3>Project Title 3</h3>
+                    <p>This is a detailed description of the third project. It demonstrates the variety and depth of expertise in this service area.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <h2 class="section-title">Who I am</h2>
+        <div class="about-content">
+            <div class="about-image">
+                <img src="../websiteimages/profile.jpg" alt="Profile Picture">
+            </div>
+            <div class="about-text">
+                <h3>Call me Kori D. Gichuki</h3>
+                <p><em>How may I help you? :) </em></p><br>
+                <p>I'm a passionate developer with over 5 years of experience in creating digital solutions. My expertise spans across web development, mobile applications, and UI/UX design.</p>
+                <p>I believe in creating clean, efficient, and user-friendly applications that solve real-world problems.</p>
+                
+                <div class="connect">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://linkedin.com/in/kori-gichuki/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                        <a href="https://instagram.com/kori_gichuki/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+                        <a href="https://medium.com/@korigichuki/" target="_blank"><i class="fab fa-medium"></i> Medium</a>
+                        <a href="../websiteimages/cv.pdf" download><i class="fas fa-download"></i> Download CV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <h2 class="section-title">What I have achieved</h2>
+        <div class="project-slider">
+            <div class="project-slides">
+                <div class="project-slide active">
+                    <img src="../websiteimages/project1.jpg" alt="Project 1">
+                    <div class="project-info">
+                        <h3>E-commerce Platform</h3>
+                        <p>A full-featured online store with payment integration</p>
+                    </div>
+                </div>
+                <div class="project-slide">
+                    <img src="../websiteimages/project2.jpg" alt="Project 2">
+                    <div class="project-info">
+                        <h3>Portfolio Website</h3>
+                        <p>Responsive portfolio for a professional photographer</p>
+                    </div>
+                </div>
+                <div class="project-slide">
+                    <img src="../websiteimages/project3.jpg" alt="Project 3">
+                    <div class="project-info">
+                        <h3>Mobile App</h3>
+                        <p>Fitness tracking application for iOS and Android</p>
+                    </div>
+                </div>
+            </div>
+            <button class="slider-control prev">&lt;</button>
+            <button class="slider-control next">&gt;</button>
+        </div>
+        
+        <div class="reviews">
+            <h3>Client Reviews</h3>
+            <div class="review-slider">
+                <div class="review-slides">
+                    <div class="review-slide active">
+                        <p>"Working with John was a pleasure. He delivered the project on time and exceeded our expectations."</p>
+                        <div class="reviewer">- Jane Smith, CEO</div>
+                    </div>
+                    <div class="review-slide">
+                        <p>"The website John created for us has significantly increased our online presence and sales."</p>
+                        <div class="reviewer">- Mike Johnson, Marketing Director</div>
+                    </div>
+                    <div class="review-slide">
+                        <p>"Excellent communication and technical skills. Would definitely work with John again."</p>
+                        <div class="reviewer">- Sarah Williams, Project Manager</div>
+                    </div>
+                </div>
+                <div class="review-dots">
+                    <span class="dot active" data-index="0"></span>
+                    <span class="dot" data-index="1"></span>
+                    <span class="dot" data-index="2"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2 class="section-title">Get In Touch</h2>
+        <div class="contact-container">
+            <form id="contact-form" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+                    <button type="submit" class="send-btn">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        let currentSlide = 0;
+
+        function openServiceModal(serviceType) {
+            document.getElementById('service-modal').style.display = 'flex';
+            currentSlide = 0;
+            showSlide(currentSlide);
+        }
+
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.modal-slide');
+            const descriptions = document.querySelectorAll('.description-slide');
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            descriptions.forEach(desc => desc.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            descriptions[index].classList.add('active');
+        }
+
+        document.querySelector('.modal-control.prev').addEventListener('click', () => {
+            currentSlide = currentSlide > 0 ? currentSlide - 1 : 2;
+            showSlide(currentSlide);
+        });
+
+        document.querySelector('.modal-control.next').addEventListener('click', () => {
+            currentSlide = currentSlide < 2 ? currentSlide + 1 : 0;
+            showSlide(currentSlide);
+        });
+
+        document.getElementById('service-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'service-modal') {
+                document.getElementById('service-modal').style.display = 'none';
+            }
+        });
+
+        function clearForm() {
+            document.getElementById('contact-form').reset();
+        }
+
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>   
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2023 Portfolio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../websitejs/script.js"></script>
+</body>
+</html>
