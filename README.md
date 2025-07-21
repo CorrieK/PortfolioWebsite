@@ -23,8 +23,7 @@ A modern, responsive portfolio website showcasing cloud engineering expertise an
 
 ```
 portfolio-website/
-├── website/
-│   └── index.html          # Main HTML file
+├── index.html              # Main HTML file
 ├── websitecss/
 │   └── styles.css          # Main stylesheet
 ├── websiteimages/          # Image assets
@@ -37,6 +36,8 @@ portfolio-website/
 │   ├── project2.jpg
 │   ├── project3.jpg
 │   └── cv.pdf
+├── websitejs/
+│   └── script.js           # JavaScript file
 └── README.md
 
 ```
@@ -53,7 +54,7 @@ portfolio-website/
 ## Getting Started
 
 1. Clone the repository
-2. Open `website/index.html` in your browser
+2. Open `index.html` in your browser
 3. No build process required - it's a static website
 
 ## Responsive Breakpoints
