@@ -13,7 +13,7 @@
     <nav class="navbar">
         <div class="logo">
             <a href="#" target="_blank">
-                <h2> Glad to have you here ... Kori on :) </h2>
+                <h5> Glad to have you here ... Kori on &#128522; </h5>
             </a>
         </div>
         <div class="hamburger" onclick="toggleMenu()">
@@ -24,7 +24,7 @@
         <ul class="nav-links">
             <li><a href="#services">What I do</a></li>
             <li><a href="#about">Who I am</a></li>
-            <li><a href="#projects">What I have achieved</a></li>
+            <li><a href="#articles">My Blog</a></li>
             <li><a href="#contact">Get in touch</a></li>
         </ul>
     </nav>
@@ -34,24 +34,24 @@
         <div class="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="websiteimages/slide1.jpg" alt="Slide 1">
+                    <img src="websiteimages/slide1.jpg" alt="Professional Introduction">
                     <div class="carousel-caption">
-                        <h2>Welcome to My Portfolio</h2>
-                        <p>Creating innovative solutions for your needs</p>
+                        <h2>Transforming Ideas into Cloud Reality</h2>
+                        <p>5+ years of turning complex business challenges into scalable cloud solutions. Let's build something extraordinary together.</p>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="websiteimages/slide2.jpg" alt="Slide 2">
+                    <img src="websiteimages/slide2.jpg" alt="Technical Expertise">
                     <div class="carousel-caption">
-                        <h2>Creative Design</h2>
-                        <p>Turning ideas into reality</p>
+                        <h2>Where Innovation Meets Implementation</h2>
+                        <p>From AWS architecture to data pipelines - bridging the gap between cutting-edge technology and real-world business impact.</p>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="websiteimages/slide3.jpg" alt="Slide 3">
+                    <img src="websiteimages/slide3.jpg" alt="Thought Leadership">
                     <div class="carousel-caption">
-                        <h2>Professional Development</h2>
-                        <p>Building solutions that work</p>
+                        <h2>Sharing Knowledge, Inspiring Growth</h2>
+                        <p>Empowering the tech community through speaking engagements, technical writing, and mentorship. Your success story starts here.</p>
                     </div>
                 </div>
             </div>
@@ -129,6 +129,20 @@
                     <p>This is a detailed description of the third project. It demonstrates the variety and depth of expertise in this service area.</p>
                 </div>
             </div>
+            <div class="modal-caption">
+                <div class="caption-slide active">
+                    <h4>Caption Title 1</h4>
+                    <p>Short caption description for the first slide that provides additional context about what is being displayed in the image above.</p>
+                </div>
+                <div class="caption-slide">
+                    <h4>Caption Title 2</h4>
+                    <p>Short caption description for the second slide that provides additional context about what is being displayed in the image above.</p>
+                </div>
+                <div class="caption-slide">
+                    <h4>Caption Title 3</h4>
+                    <p>Short caption description for the third slide that provides additional context about what is being displayed in the image above.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -158,59 +172,40 @@
         </div>
     </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="projects">
-        <h2 class="section-title">What I have achieved</h2>
-        <div class="project-slider">
-            <div class="project-slides">
-                <div class="project-slide active">
-                    <img src="websiteimages/project1.jpg" alt="Project 1">
-                    <div class="project-info">
-                        <h3>E-commerce Platform</h3>
-                        <p>A full-featured online store with payment integration</p>
-                    </div>
+    <!-- Articles Section -->
+    <section id="articles" class="articles">
+        <h2 class="section-title">My Blog</h2>
+        <div class="articles-container">
+            <div class="articles-wrapper">
+                <button class="scroll-arrow scroll-left" onclick="scrollArticles('left')">&lt;</button>
+                <div id="medium-articles" class="articles-grid">
+                    <div class="loading">Loading articles...</div>
                 </div>
-                <div class="project-slide">
-                    <img src="websiteimages/project2.jpg" alt="Project 2">
-                    <div class="project-info">
-                        <h3>Portfolio Website</h3>
-                        <p>Responsive portfolio for a professional photographer</p>
-                    </div>
-                </div>
-                <div class="project-slide">
-                    <img src="websiteimages/project3.jpg" alt="Project 3">
-                    <div class="project-info">
-                        <h3>Mobile App</h3>
-                        <p>Fitness tracking application for iOS and Android</p>
-                    </div>
-                </div>
+                <button class="scroll-arrow scroll-right" onclick="scrollArticles('right')">&gt;</button>
             </div>
-            <button class="slider-control prev">&lt;</button>
-            <button class="slider-control next">&gt;</button>
+            <div class="read-more">
+                <a href="https://medium.com/@korigichuki" target="_blank" class="read-more-btn">
+                    <i class="fab fa-medium"></i> Read More on Medium
+                </a>
+            </div>
         </div>
-        
-        <div class="reviews">
-            <h3>Client Reviews</h3>
-            <div class="review-slider">
-                <div class="review-slides">
-                    <div class="review-slide active">
-                        <p>"Working with John was a pleasure. He delivered the project on time and exceeded our expectations."</p>
-                        <div class="reviewer">- Jane Smith, CEO</div>
-                    </div>
-                    <div class="review-slide">
-                        <p>"The website John created for us has significantly increased our online presence and sales."</p>
-                        <div class="reviewer">- Mike Johnson, Marketing Director</div>
-                    </div>
-                    <div class="review-slide">
-                        <p>"Excellent communication and technical skills. Would definitely work with John again."</p>
-                        <div class="reviewer">- Sarah Williams, Project Manager</div>
-                    </div>
+    </section>
+
+    <!-- Social Section -->
+    <section id="social" class="social">
+        <h2 class="section-title">Get Social</h2>
+        <div class="social-container">
+            <div class="social-wrapper">
+                <button class="scroll-arrow scroll-left" onclick="scrollSocial('left')">&lt;</button>
+                <div id="instagram-posts" class="social-grid">
+                    <div class="loading">Loading Instagram posts...</div>
                 </div>
-                <div class="review-dots">
-                    <span class="dot active" data-index="0"></span>
-                    <span class="dot" data-index="1"></span>
-                    <span class="dot" data-index="2"></span>
-                </div>
+                <button class="scroll-arrow scroll-right" onclick="scrollSocial('right')">&gt;</button>
+            </div>
+            <div class="view-more">
+                <a href="https://instagram.com/kori_gichuki" target="_blank" class="view-more-btn">
+                    <i class="fab fa-instagram"></i> View More on Instagram
+                </a>
             </div>
         </div>
     </section>
@@ -253,8 +248,75 @@
 
     <script>
         let currentSlide = 0;
+        
+        const serviceContent = {
+            'cloud-engineering': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/0066cc/white?text=AWS+Architecture', title: 'AWS Cloud Solutions', desc: 'Scalable cloud infrastructure design and implementation using AWS services.', captionTitle: 'Enterprise Cloud Architecture', captionDesc: 'This diagram showcases a multi-tier AWS architecture with load balancers, auto-scaling groups, and RDS databases for high availability.' },
+                    { img: 'https://via.placeholder.com/600x300/ff6600/white?text=Serverless+Apps', title: 'Serverless Applications', desc: 'Building cost-effective serverless solutions with Lambda and API Gateway.', captionTitle: 'Serverless Microservices', captionDesc: 'A serverless application architecture using AWS Lambda functions, API Gateway, and DynamoDB for scalable event-driven processing.' },
+                    { img: 'https://via.placeholder.com/600x300/009900/white?text=Cloud+Migration', title: 'Cloud Migration', desc: 'Seamless migration of on-premise applications to cloud platforms.', captionTitle: 'Migration Strategy Dashboard', captionDesc: 'Visual representation of the cloud migration process showing assessment, planning, and execution phases with timeline and milestones.' }
+                ]
+            },
+            'devops': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/cc0066/white?text=CI/CD+Pipeline', title: 'CI/CD Pipelines', desc: 'Automated deployment pipelines using Jenkins, GitLab CI, and GitHub Actions.', captionTitle: 'Automated Deployment Flow', captionDesc: 'Complete CI/CD pipeline showing code commit, automated testing, build processes, and deployment to multiple environments.' },
+                    { img: 'https://via.placeholder.com/600x300/6600cc/white?text=Docker+K8s', title: 'Containerization', desc: 'Docker containerization and Kubernetes orchestration for scalable applications.', captionTitle: 'Container Orchestration', captionDesc: 'Kubernetes cluster architecture with pods, services, and ingress controllers managing containerized applications at scale.' },
+                    { img: 'https://via.placeholder.com/600x300/cc6600/white?text=Infrastructure', title: 'Infrastructure as Code', desc: 'Terraform and CloudFormation for automated infrastructure provisioning.', captionTitle: 'IaC Implementation', captionDesc: 'Terraform configuration files and CloudFormation templates used to provision and manage cloud infrastructure programmatically.' }
+                ]
+            },
+            'data-engineering': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/0099cc/white?text=Data+Pipeline', title: 'Data Pipelines', desc: 'ETL/ELT pipelines using Apache Airflow and AWS Glue for data processing.', captionTitle: 'Real-time Data Processing', captionDesc: 'Apache Airflow DAG visualization showing data extraction, transformation, and loading processes with scheduling and monitoring.' },
+                    { img: 'https://via.placeholder.com/600x300/cc9900/white?text=Big+Data', title: 'Big Data Analytics', desc: 'Processing large datasets with Spark, Hadoop, and cloud-native solutions.', captionTitle: 'Big Data Architecture', captionDesc: 'Distributed computing framework using Apache Spark clusters for processing petabytes of data with real-time analytics capabilities.' },
+                    { img: 'https://via.placeholder.com/600x300/9900cc/white?text=Data+Lake', title: 'Data Lake Architecture', desc: 'Designing and implementing scalable data lake solutions on AWS S3.', captionTitle: 'Data Lake Implementation', captionDesc: 'AWS S3-based data lake architecture with data cataloging, governance, and analytics tools for structured and unstructured data.' }
+                ]
+            },
+            'ui-ux': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/cc3300/white?text=User+Research', title: 'User Research', desc: 'Conducting user interviews and usability testing to inform design decisions.', captionTitle: 'User Journey Mapping', captionDesc: 'Comprehensive user research findings including personas, journey maps, and pain points identified through interviews and testing sessions.' },
+                    { img: 'https://via.placeholder.com/600x300/33cc00/white?text=Wireframing', title: 'Wireframing & Prototyping', desc: 'Creating interactive prototypes using Figma and Adobe XD.', captionTitle: 'Interactive Prototypes', captionDesc: 'High-fidelity wireframes and clickable prototypes created in Figma showing user flows and interaction patterns for mobile and web.' },
+                    { img: 'https://via.placeholder.com/600x300/3300cc/white?text=Design+System', title: 'Design Systems', desc: 'Building consistent design systems and component libraries.', captionTitle: 'Component Library', captionDesc: 'Comprehensive design system documentation including color palettes, typography, components, and usage guidelines for consistent UI.' }
+                ]
+            },
+            'technical-writing': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/cc6633/white?text=Documentation', title: 'Technical Documentation', desc: 'Creating comprehensive API documentation and user guides.', captionTitle: 'API Documentation Portal', captionDesc: 'Interactive API documentation with code examples, authentication guides, and endpoint references for developer onboarding.' },
+                    { img: 'https://via.placeholder.com/600x300/66cc33/white?text=Blog+Posts', title: 'Technical Blog Posts', desc: 'Writing engaging technical articles and tutorials for developer audiences.', captionTitle: 'Technical Tutorial Series', captionDesc: 'Step-by-step tutorial articles covering cloud technologies, best practices, and implementation guides with code samples and diagrams.' },
+                    { img: 'https://via.placeholder.com/600x300/3366cc/white?text=Content+Strategy', title: 'Content Strategy', desc: 'Developing content strategies for technical products and platforms.', captionTitle: 'Content Strategy Framework', captionDesc: 'Strategic content planning document outlining target audiences, content types, distribution channels, and success metrics for technical content.' }
+                ]
+            },
+            'speaking': {
+                slides: [
+                    { img: 'https://via.placeholder.com/600x300/cc3366/white?text=Conference+Talks', title: 'Conference Speaking', desc: 'Delivering keynotes and technical talks at industry conferences.', captionTitle: 'Keynote Presentation', captionDesc: 'Speaking at major tech conferences about cloud architecture trends, sharing insights with industry professionals and thought leaders.' },
+                    { img: 'https://via.placeholder.com/600x300/66cc99/white?text=Workshops', title: 'Technical Workshops', desc: 'Conducting hands-on workshops on cloud technologies and best practices.', captionTitle: 'Hands-on Workshop Session', captionDesc: 'Interactive workshop environment where participants learn cloud technologies through practical exercises and real-world scenarios.' },
+                    { img: 'https://via.placeholder.com/600x300/9966cc/white?text=Webinars', title: 'Webinars & Panels', desc: 'Hosting webinars and participating in expert panel discussions.', captionTitle: 'Expert Panel Discussion', captionDesc: 'Participating in industry panel discussions and hosting educational webinars on emerging technologies and best practices.' }
+                ]
+            }
+        };
 
         function openServiceModal(serviceType) {
+            const content = serviceContent[serviceType];
+            if (!content) return;
+            
+            const slides = document.querySelectorAll('.modal-slide');
+            const descriptions = document.querySelectorAll('.description-slide');
+            const captions = document.querySelectorAll('.caption-slide');
+            
+            content.slides.forEach((slide, index) => {
+                if (slides[index]) {
+                    slides[index].querySelector('img').src = slide.img;
+                    slides[index].querySelector('img').alt = slide.title;
+                }
+                if (descriptions[index]) {
+                    descriptions[index].querySelector('h3').textContent = slide.title;
+                    descriptions[index].querySelector('p').textContent = slide.desc;
+                }
+                if (captions[index]) {
+                    captions[index].querySelector('h4').textContent = slide.captionTitle;
+                    captions[index].querySelector('p').textContent = slide.captionDesc;
+                }
+            });
+            
             document.getElementById('service-modal').style.display = 'flex';
             currentSlide = 0;
             showSlide(currentSlide);
@@ -263,12 +325,15 @@
         function showSlide(index) {
             const slides = document.querySelectorAll('.modal-slide');
             const descriptions = document.querySelectorAll('.description-slide');
+            const captions = document.querySelectorAll('.caption-slide');
             
             slides.forEach(slide => slide.classList.remove('active'));
             descriptions.forEach(desc => desc.classList.remove('active'));
+            captions.forEach(caption => caption.classList.remove('active'));
             
             slides[index].classList.add('active');
             descriptions[index].classList.add('active');
+            captions[index].classList.add('active');
         }
 
         document.querySelector('.modal-control.prev').addEventListener('click', () => {
@@ -294,6 +359,108 @@
         function toggleMenu() {
             document.querySelector('.nav-links').classList.toggle('active');
         }
+
+        // Fetch Medium articles
+        async function fetchMediumArticles() {
+            try {
+                const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@korigichuki');
+                const data = await response.json();
+                
+                // Sort articles by date (newest first) and take first 5
+                const articles = data.items
+                    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+                    .slice(0, 5);
+                
+                const articlesContainer = document.getElementById('medium-articles');
+                articlesContainer.innerHTML = '';
+                
+                articles.forEach(article => {
+                    const articleElement = document.createElement('div');
+                    articleElement.className = 'article-card';
+                    
+                    // Extract image from content or use placeholder
+                    let imageUrl = 'https://via.placeholder.com/120x120/ff8c00/white?text=Article';
+                    if (article.thumbnail) {
+                        imageUrl = article.thumbnail;
+                    } else if (article.content && article.content.includes('<img')) {
+                        const imgMatch = article.content.match(/<img[^>]+src="([^"]+)"/i);
+                        if (imgMatch) imageUrl = imgMatch[1];
+                    }
+                    
+                    articleElement.innerHTML = `
+                        <div class="article-header">
+                            <div class="article-image">
+                                <img src="${imageUrl}" alt="${article.title}" onerror="this.src='https://via.placeholder.com/80x80/ff8c00/white?text=Article'">
+                            </div>
+                            <div class="article-title">
+                                <h3>${article.title}</h3>
+                            </div>
+                        </div>
+                        <a href="${article.link}" target="_blank" class="read-article">Read article</a>
+                    `;
+                    articlesContainer.appendChild(articleElement);
+                });
+            } catch (error) {
+                document.getElementById('medium-articles').innerHTML = '<p>Unable to load articles at the moment.</p>';
+            }
+        }
+
+        // Load Instagram posts (using mock data - Instagram API requires authentication)
+        async function loadInstagramPosts() {
+            const instagramContainer = document.getElementById('instagram-posts');
+            
+            // Mock posts with realistic content for @kori_gichuki
+            const mockPosts = [
+                { image: 'https://via.placeholder.com/280x120/ff8c00/white?text=Cloud+Architecture', caption: 'Working on cloud architecture diagrams today! #CloudEngineering #AWS' },
+                { image: 'https://via.placeholder.com/280x120/0066cc/white?text=DevOps+Workshop', caption: 'Just finished a great DevOps workshop. Amazing turnout! #DevOps #Learning' },
+                { image: 'https://via.placeholder.com/280x120/009900/white?text=Data+Pipeline', caption: 'Data pipeline optimization complete. Performance improved by 40%! #DataEngineering' },
+                { image: 'https://via.placeholder.com/280x120/cc0066/white?text=Tech+Conference', caption: 'Speaking at the tech conference next week. Excited to share insights! #TechTalk' },
+                { image: 'https://via.placeholder.com/280x120/6600cc/white?text=Medium+Article', caption: 'New blog post published on Medium about serverless architecture #Serverless' }
+            ];
+            
+            instagramContainer.innerHTML = '';
+            
+            mockPosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'instagram-post';
+                postElement.innerHTML = `
+                    <div class="post-image">
+                        <img src="${post.image}" alt="Instagram post">
+                    </div>
+                    <div class="post-caption">
+                        <p>${post.caption}</p>
+                    </div>
+                `;
+                instagramContainer.appendChild(postElement);
+            });
+        }
+
+        // Scroll functions for articles and social sections
+        function scrollArticles(direction) {
+            const container = document.getElementById('medium-articles');
+            const scrollAmount = 300;
+            if (direction === 'left') {
+                container.scrollLeft -= scrollAmount;
+            } else {
+                container.scrollLeft += scrollAmount;
+            }
+        }
+
+        function scrollSocial(direction) {
+            const container = document.getElementById('instagram-posts');
+            const scrollAmount = 300;
+            if (direction === 'left') {
+                container.scrollLeft -= scrollAmount;
+            } else {
+                container.scrollLeft += scrollAmount;
+            }
+        }
+
+        // Load content when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchMediumArticles();
+            loadInstagramPosts();
+        });
     </script>
     <script src="websitejs/script.js"></script>
 </body>
