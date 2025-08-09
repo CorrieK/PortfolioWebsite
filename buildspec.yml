@@ -1,12 +1,18 @@
 version: 0.2
 phases:
   install:
+    runtime-versions:
+      python: 3.9
     commands:
-      - npm install
+      - echo Build started on `date`
   build:
     commands:
-      - npm run build
+      - echo Copying website files to S3 bucket
+      - aws s3 sync . s3://korigichuki.me --delete --exclude "buildspec.yml" --exclude ".git/*"
+      - echo Build completed on `date`
 artifacts:
   files:
     - '**/*'
-  base-directory: build
+  exclude-paths:
+    - buildspec.yml
+    - .git/**/*
