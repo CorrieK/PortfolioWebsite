@@ -9,6 +9,8 @@ phases:
     commands:
       - echo Copying website files to S3 bucket
       - aws s3 sync . s3://korigichuki.me --delete --exclude "buildspec.yml" --exclude ".git/*"
+      - echo Invalidating CloudFront cache
+      - aws cloudfront create-invalidation --distribution-id E1YKID81ICNHZ --paths "/*"
       - echo Build completed on `date`
 artifacts:
   files:
