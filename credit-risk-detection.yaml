@@ -1,0 +1,336 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Credit Risk Detection & Product Recommendation Agentic AI Architecture Solution'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+  
+Resources:
+  # Data Ingestion Layer
+  RiskDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'risk-system-data-${Environment}-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ProcessedDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'processed-risk-data-${Environment}-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+
+  # Data Processing - Glue ETL
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub '${RiskDataBucket}/*'
+                  - !Sub '${ProcessedDataBucket}/*'
+
+  DataProcessingJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Sub 'risk-data-processing-${Environment}'
+      Role: !GetAtt GlueServiceRole.Arn
+      Command:
+        Name: glueetl
+        ScriptLocation: !Sub 's3://${ProcessedDataBucket}/scripts/etl-script.py'
+      DefaultArguments:
+        '--source-bucket': !Ref RiskDataBucket
+        '--target-bucket': !Ref ProcessedDataBucket
+
+  # Kinesis Data Streams for real-time processing
+  RiskDataStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Sub 'risk-data-stream-${Environment}'
+      ShardCount: 2
+      RetentionPeriodHours: 24
+
+  # EventBridge for event-driven architecture
+  RiskEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub 'risk-events-${Environment}'
+
+  # Lambda Functions
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: '*'
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt RiskAssessmentTable.Arn
+
+  RiskDetectionFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'risk-detection-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          
+          def handler(event, context):
+              # Risk detection logic using Bedrock
+              bedrock = boto3.client('bedrock-runtime')
+              # Process risk signals and invoke Sagemaker model
+              return {'statusCode': 200, 'body': json.dumps('Risk assessed')}
+      Environment:
+        Variables:
+          RISK_TABLE: !Ref RiskAssessmentTable
+          SAGEMAKER_ENDPOINT: !GetAtt SagemakerEndpoint.EndpointName
+
+  ProductRecommendationFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'product-recommendation-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          
+          def handler(event, context):
+              # Product recommendation logic using Bedrock agents
+              bedrock_agent = boto3.client('bedrock-agent-runtime')
+              # Invoke recommendation agent
+              return {'statusCode': 200, 'body': json.dumps('Product recommended')}
+
+  # DynamoDB Tables
+  RiskAssessmentTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'risk-assessments-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: clientId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: clientId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # SageMaker Model and Endpoint
+  SagemakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+
+  SagemakerModel:
+    Type: AWS::SageMaker::Model
+    Properties:
+      ModelName: !Sub 'risk-prediction-model-${Environment}'
+      ExecutionRoleArn: !GetAtt SagemakerExecutionRole.Arn
+      PrimaryContainer:
+        Image: 246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3
+        ModelDataUrl: !Sub 's3://${ProcessedDataBucket}/models/risk-model.tar.gz'
+
+  SagemakerEndpointConfig:
+    Type: AWS::SageMaker::EndpointConfig
+    Properties:
+      EndpointConfigName: !Sub 'risk-prediction-config-${Environment}'
+      ProductionVariants:
+        - ModelName: !GetAtt SagemakerModel.ModelName
+          VariantName: primary
+          InitialInstanceCount: 1
+          InstanceType: ml.t2.medium
+          InitialVariantWeight: 1
+
+  SagemakerEndpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointName: !Sub 'risk-prediction-endpoint-${Environment}'
+      EndpointConfigName: !GetAtt SagemakerEndpointConfig.EndpointConfigName
+
+  # Bedrock Knowledge Base (requires manual setup)
+  BedrockKnowledgeBaseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt ProcessedDataBucket.Arn
+                  - !Sub '${ProcessedDataBucket}/*'
+
+  # API Gateway for external access
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub 'credit-risk-api-${Environment}'
+      Description: 'API for Credit Risk Detection and Product Recommendation'
+
+  RiskAssessmentResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: 'assess-risk'
+
+  RiskAssessmentMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref RiskAssessmentResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RiskDetectionFunction.Arn}/invocations'
+
+  # EventBridge Rules for workflow orchestration
+  RiskDetectionRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref RiskEventBus
+      EventPattern:
+        source: ['risk.system']
+        detail-type: ['Risk Signal Detected']
+      Targets:
+        - Arn: !GetAtt RiskDetectionFunction.Arn
+          Id: 'RiskDetectionTarget'
+
+  ProductRecommendationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref RiskEventBus
+      EventPattern:
+        source: ['risk.assessment']
+        detail-type: ['Risk Assessment Complete']
+      Targets:
+        - Arn: !GetAtt ProductRecommendationFunction.Arn
+          Id: 'ProductRecommendationTarget'
+
+  # OpenSearch for search capabilities
+  OpenSearchDomain:
+    Type: AWS::OpenSearch::Domain
+    Properties:
+      DomainName: !Sub 'credit-risk-search-${Environment}'
+      EngineVersion: 'OpenSearch_2.3'
+      ClusterConfig:
+        InstanceType: t3.small.search
+        InstanceCount: 1
+      EBSOptions:
+        EBSEnabled: true
+        VolumeType: gp3
+        VolumeSize: 20
+      AccessPolicies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'es:*'
+            Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/credit-risk-search-${Environment}/*'
+
+Outputs:
+  ApiEndpoint:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  SagemakerEndpointName:
+    Description: 'SageMaker endpoint for risk prediction'
+    Value: !GetAtt SagemakerEndpoint.EndpointName
+  
+  RiskDataBucket:
+    Description: 'S3 bucket for risk data ingestion'
+    Value: !Ref RiskDataBucket
+  
+  OpenSearchEndpoint:
+    Description: 'OpenSearch domain endpoint'
+    Value: !GetAtt OpenSearchDomain.DomainEndpoint
+
+# Manual Setup Required:
+# 1. Bedrock Knowledge Base with Commercial Product KB, Risk Action Playbook
+# 2. Bedrock Agents configuration for Credit Product Agent
+# 3. Upload ML model artifacts to S3
+# 4. Configure Firehose delivery streams
+# 5. Set up VPC and security groups for production deployment
