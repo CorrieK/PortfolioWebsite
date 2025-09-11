@@ -158,7 +158,7 @@ Resources:
   PrivateRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref IMGenAIPrRT
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref IMGenAINAT
 
@@ -166,7 +166,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref IMGenAIPRSNet1
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref IMGenAIPrRT
 
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
