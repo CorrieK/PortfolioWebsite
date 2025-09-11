@@ -172,7 +172,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref IMGenAIPRSNet2
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref IMGenAIPrRT
 
   # Security Groups
   IMGenAIPubSG:
