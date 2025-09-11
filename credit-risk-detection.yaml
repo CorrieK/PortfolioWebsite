@@ -291,7 +291,7 @@ Resources:
 
   # OpenSearch for search capabilities
   OpenSearchDomain:
-    Type: AWS::OpenSearch::Domain
+    Type: AWS::OpenSearchService::Domain
     Properties:
       DomainName: !Sub 'credit-risk-search-${Environment}'
       EngineVersion: 'OpenSearch_2.3'
@@ -314,7 +314,7 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: 'API Gateway endpoint URL'
-    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
   
   SagemakerEndpointName:
     Description: 'SageMaker endpoint for risk prediction'
