@@ -131,7 +131,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: AttachGateway
     Properties:
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref IMGenAIPubRT
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref IMGenAIIGW
 
@@ -139,13 +139,13 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref IMGenAIPubSNet1
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref IMGenAIPubRT
 
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref IMGenAIPubSNet2
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref IMGenAIPubRT
 
   IMGenAIPrRT:
     Type: AWS::EC2::RouteTable
