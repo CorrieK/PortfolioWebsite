@@ -298,6 +298,54 @@ Resources:
         - Arn: !GetAtt ProductRecommendationFunction.Arn
           Id: 'ProductRecommendationTarget'
 
+  # Lambda Permissions
+  RiskDetectionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref RiskDetectionFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt RiskDetectionRule.Arn
+
+  ProductRecommendationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ProductRecommendationFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt ProductRecommendationRule.Arn
+
+  ApiGatewayLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref RiskDetectionFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/*'
+
+Outputs:
+  ApiEndpoint:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  RiskDataBucket:
+    Description: 'S3 bucket for risk data'
+    Value: !Ref RiskDataBucket
+  SagemakerEndpoint:
+    Description: 'SageMaker endpoint for risk prediction'
+    Value: !Ref SagemakerEndpointrn
+          Id: 'RiskDetectionTarget'
+
+  ProductRecommendationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref RiskEventBus
+      EventPattern:
+        source: ['risk.assessment']
+        detail-type: ['Risk Assessment Complete']
+      Targets:
+        - Arn: !GetAtt ProductRecommendationFunction.Arn
+          Id: 'ProductRecommendationTarget'
+
   # Lambda Permissions for EventBridge
   RiskDetectionPermission:
     Type: AWS::Lambda::Permission
