@@ -119,7 +119,7 @@ Resources:
           Value: !Sub '${Environment}-nat-gateway'
 
   # Route Tables
-  IMGenAIPrRT:
+  IMGenAIPubRT:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref IMGenAIVPC
