@@ -1,0 +1,417 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Churn Management and Next Best Action (NBA) Solution for Retail Clients'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+
+Resources:
+  # S3 Buckets
+  ChurnDataLanding:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'churn-data-landing-${Environment}-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  ChurnDataProcessed:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'churn-data-processed-${Environment}-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # Kinesis Data Streams
+  ChurnDataStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Sub 'churn-data-stream-${Environment}'
+      ShardCount: 2
+      RetentionPeriodHours: 24
+
+  # DynamoDB Tables
+  ChurnPredictionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'churn-predictions-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: clientId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: clientId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  NBARecommendationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'nba-recommendations-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: clientId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: clientId
+          KeyType: HASH
+
+  # EventBridge Custom Bus
+  ChurnEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub 'churn-event-bus-${Environment}'
+
+  # IAM Roles
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                  - bedrock-agent:InvokeAgent
+                Resource: '*'
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: 
+                  - !GetAtt ChurnPredictionTable.Arn
+                  - !GetAtt NBARecommendationTable.Arn
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub '${ChurnDataLanding}/*'
+                  - !Sub '${ChurnDataProcessed}/*'
+        - PolicyName: SageMakerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sagemaker:InvokeEndpoint
+                Resource: !Sub 'arn:aws:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*'
+
+  # Lambda Functions
+  ChurnPredictionFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'churn-prediction-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 300
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-SG-ID'
+        SubnetIds:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-1-ID'
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-2-ID'
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          
+          def handler(event, context):
+              # MANUAL INTERVENTION REQUIRED: Implement churn prediction logic
+              sagemaker = boto3.client('sagemaker-runtime')
+              dynamodb = boto3.resource('dynamodb')
+              
+              table = dynamodb.Table(os.environ['CHURN_TABLE'])
+              
+              # Process churn prediction
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({
+                      'churnRisk': 'HIGH',
+                      'churnScore': 0.85,
+                      'factors': ['Low engagement', 'Reduced transactions']
+                  })
+              }
+      Environment:
+        Variables:
+          CHURN_TABLE: !Ref ChurnPredictionTable
+          SAGEMAKER_ENDPOINT: !Sub 'churn-model-endpoint-${Environment}'
+
+  NBARecommendationFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'nba-recommendation-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 300
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-SG-ID'
+        SubnetIds:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-1-ID'
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-2-ID'
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          
+          def handler(event, context):
+              # MANUAL INTERVENTION REQUIRED: Implement NBA logic using Bedrock Agent
+              bedrock_agent = boto3.client('bedrock-agent-runtime')
+              dynamodb = boto3.resource('dynamodb')
+              
+              table = dynamodb.Table(os.environ['NBA_TABLE'])
+              
+              # Generate NBA recommendations
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({
+                      'recommendations': [
+                          'Low-interest savings promo',
+                          'Credit card upgrade offer',
+                          'Investment consultation'
+                      ]
+                  })
+              }
+      Environment:
+        Variables:
+          NBA_TABLE: !Ref NBARecommendationTable
+          BEDROCK_AGENT_ID: 'MANUAL_INTERVENTION_REQUIRED'
+
+  # Glue ETL Job
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub '${ChurnDataLanding}/*'
+                  - !Sub '${ChurnDataProcessed}/*'
+
+  ChurnDataETLJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Sub 'churn-data-etl-${Environment}'
+      Role: !GetAtt GlueServiceRole.Arn
+      Command:
+        Name: glueetl
+        ScriptLocation: !Sub 's3://${ChurnDataProcessed}/scripts/churn-etl.py'
+        PythonVersion: '3'
+      DefaultArguments:
+        '--job-language': python
+        '--source-bucket': !Ref ChurnDataLanding
+        '--target-bucket': !Ref ChurnDataProcessed
+      MaxRetries: 1
+      Timeout: 60
+
+  # SageMaker Components
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+      Policies:
+        - PolicyName: VPCAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:CreateNetworkInterfacePermission
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                Resource: '*'
+
+  ChurnPredictionModel:
+    Type: AWS::SageMaker::Model
+    Properties:
+      ModelName: !Sub 'churn-prediction-model-${Environment}'
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-SG-ID'
+        Subnets:
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-1-ID'
+          - !ImportValue 
+            Fn::Sub: '${Environment}-Private-Subnet-2-ID'
+      PrimaryContainer:
+        Image: 246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3
+        ModelDataUrl: !Sub 's3://${ChurnDataProcessed}/models/churn-model.tar.gz'
+
+  ChurnEndpointConfig:
+    Type: AWS::SageMaker::EndpointConfig
+    Properties:
+      EndpointConfigName: !Sub 'churn-endpoint-config-${Environment}'
+      ProductionVariants:
+        - ModelName: !GetAtt ChurnPredictionModel.ModelName
+          VariantName: primary
+          InitialInstanceCount: 1
+          InstanceType: ml.t2.medium
+          InitialVariantWeight: 1
+
+  ChurnEndpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointName: !Sub 'churn-model-endpoint-${Environment}'
+      EndpointConfigName: !GetAtt ChurnEndpointConfig.EndpointConfigName
+
+  # API Gateway
+  ChurnNBAApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub 'churn-nba-api-${Environment}'
+      Description: 'API for Churn Management and NBA'
+
+  ChurnResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ChurnNBAApi
+      ParentId: !GetAtt ChurnNBAApi.RootResourceId
+      PathPart: 'churn-prediction'
+
+  ChurnMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ChurnNBAApi
+      ResourceId: !Ref ChurnResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ChurnPredictionFunction.Arn}/invocations'
+
+  # Lambda Permissions
+  ChurnLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ChurnPredictionFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ChurnNBAApi}/*/*'
+
+  # EventBridge Rules
+  ChurnDetectionRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref ChurnEventBus
+      EventPattern:
+        source: ['churn.system']
+        detail-type: ['Low Engagement Detected']
+      Targets:
+        - Arn: !GetAtt ChurnPredictionFunction.Arn
+          Id: 'ChurnPredictionTarget'
+
+  NBARule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref ChurnEventBus
+      EventPattern:
+        source: ['churn.prediction']
+        detail-type: ['High Churn Risk Identified']
+      Targets:
+        - Arn: !GetAtt NBARecommendationFunction.Arn
+          Id: 'NBATarget'
+
+Outputs:
+  ChurnApiUrl:
+    Description: Churn Management API URL
+    Value: !Sub 'https://${ChurnNBAApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${Environment}-Churn-API-URL'
+
+  ChurnDataStreamName:
+    Description: Kinesis Data Stream Name
+    Value: !Ref ChurnDataStream
+    Export:
+      Name: !Sub '${Environment}-Churn-Data-Stream'
+
+  ChurnPredictionTableName:
+    Description: DynamoDB Churn Prediction Table
+    Value: !Ref ChurnPredictionTable
+    Export:
+      Name: !Sub '${Environment}-Churn-Prediction-Table'
+
+  SageMakerEndpointName:
+    Description: SageMaker Churn Endpoint
+    Value: !Ref ChurnEndpoint
+    Export:
+      Name: !Sub '${Environment}-Churn-Endpoint'

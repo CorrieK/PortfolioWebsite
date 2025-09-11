@@ -1,0 +1,263 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'VPC Infrastructure with 2 AZs, public/private subnets, IGW, NAT gateway'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+  
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+  
+  IMGenAIPubSNet1Cidr:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: CIDR block for public subnet 1
+  
+  IMGenAIPubSNet2Cidr:
+    Type: String
+    Default: 10.0.2.0/24
+    Description: CIDR block for public subnet 2
+  
+  IMGenAIPRSNet1Cidr:
+    Type: String
+    Default: 10.0.3.0/24
+    Description: CIDR block for private subnet 1
+  
+  IMGenAIPRSNet2Cidr:
+    Type: String
+    Default: 10.0.4.0/24
+    Description: CIDR block for private subnet 2
+
+Resources:
+  # VPC
+  IMGenAIVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-vpc'
+
+  # Internet Gateway
+  IMGenAIIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-igw'
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      InternetGatewayId: !Ref IMGenAIIGW
+
+  # Public Subnets
+  IMGenAIPubSNet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      CidrBlock: !Ref IMGenAIPubSNet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-public-subnet-1'
+
+  IMGenAIPubSNet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      CidrBlock: !Ref IMGenAIPubSNet2Cidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-public-subnet-2'
+
+  # Private Subnets
+  IMGenAIPRSNet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      CidrBlock: !Ref IMGenAIPRSNet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-subnet-1'
+
+  IMGenAIPRSNet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      CidrBlock: !Ref IMGenAIPRSNet2Cidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-subnet-2'
+
+  # NAT Gateway
+  IMGenAINATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+
+  IMGenAINAT:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt IMGenAINATEIP.AllocationId
+      SubnetId: !Ref IMGenAIPubSNet1
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-nat-gateway'
+
+  # Route Tables
+  IMGenAIPrRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-public-rt'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IMGenAIIGW
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IMGenAIPubSNet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IMGenAIPubSNet2
+      RouteTableId: !Ref PublicRouteTable
+
+  IMGenAIPrRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IMGenAIVPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-rt'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref IMGenAINAT
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IMGenAIPRSNet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IMGenAIPRSNet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # Security Groups
+  IMGenAIPubSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for public subnets
+      VpcId: !Ref IMGenAIVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-public-sg'
+
+  IMGenAIPrSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for private subnets
+      VpcId: !Ref IMGenAIVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          SourceSecurityGroupId: !Ref IMGenAIPubSG
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-sg'
+
+Outputs:
+  VPCId:
+    Description: VPC ID
+    Value: !Ref IMGenAIVPC
+    Export:
+      Name: !Sub '${Environment}-VPC-ID'
+
+  PublicSecurityGroupId:
+    Description: Public Security Group ID
+    Value: !Ref IMGenAIPubSG
+    Export:
+      Name: !Sub '${Environment}-Public-SG-ID'
+
+  PrivateSecurityGroupId:
+    Description: Private Security Group ID
+    Value: !Ref IMGenAIPrSG
+    Export:
+      Name: !Sub '${Environment}-Private-SG-ID'
+
+  NATGatewayId:
+    Description: NAT Gateway ID
+    Value: !Ref IMGenAINAT
+    Export:
+      Name: !Sub '${Environment}-NAT-Gateway-ID'
+
+  InternetGatewayId:
+    Description: Internet Gateway ID
+    Value: !Ref IMGenAIIGW
+    Export:
+      Name: !Sub '${Environment}-IGW-ID'
+
+  PublicSubnet1Id:
+    Description: Public Subnet 1 ID
+    Value: !Ref IMGenAIPubSNet1
+    Export:
+      Name: !Sub '${Environment}-Public-Subnet-1-ID'
+
+  PublicSubnet2Id:
+    Description: Public Subnet 2 ID
+    Value: !Ref IMGenAIPubSNet2
+    Export:
+      Name: !Sub '${Environment}-Public-Subnet-2-ID'
+
+  PrivateSubnet1Id:
+    Description: Private Subnet 1 ID
+    Value: !Ref IMGenAIPRSNet1
+    Export:
+      Name: !Sub '${Environment}-Private-Subnet-1-ID'
+
+  PrivateSubnet2Id:
+    Description: Private Subnet 2 ID
+    Value: !Ref IMGenAIPRSNet2
+    Export:
+      Name: !Sub '${Environment}-Private-Subnet-2-ID'
