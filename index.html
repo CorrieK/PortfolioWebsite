@@ -63,6 +63,12 @@
         .newsletter-form button { padding: 0.75rem 1.5rem; background-color: #ff8c00; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; transition: background-color 0.3s ease; }
         .newsletter-form button:hover { background-color: #e67e00; }
         
+        /* Subscription popup */
+        .subscription-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; z-index: 2000; text-align: center; }
+        .subscription-popup.show { display: block; }
+        .subscription-popup i { color: #28a745; font-size: 2rem; margin-bottom: 0.5rem; }
+        .subscription-popup p { margin: 0; font-weight: 500; color: #333; }
+        
         /* Desktop styles */
         @media (min-width: 768px) {
             .articles-wrapper { display: flex; align-items: center; }
@@ -112,6 +118,7 @@
             <li><a href="#about">Who I am</a></li>
             <li><a href="#services">What I Do</a></li>
             <li><a href="#articles">My Blog</a></li>
+            <li><a href="#cta">Let's Connect</a></li>
         </ul>
     </nav>
 
@@ -264,9 +271,11 @@
 
 
     <!-- Call to Action Section -->
-    <section class="cta">
+    <section id="cta" class="cta">
+        <h2 class="section-title">Let's Connect </h2>
         <div class="cta-container">
-            <p>If you're looking for a cloud professional to lead migrations, architect secure multi-cloud environments, or optimize your cloud strategy, let's connect. I also welcome invitations to share knowledge through speaking, writing, or mentoring—because the future of the cloud is stronger when we grow together.</p>
+            <p>Are you looking for a <b> cloud professional </b> to <em>lead migrations, architect secure multi-cloud environments, or optimize your cloud strategy? </em> <br> <b> <em> Look no further ... let's connect. </em></b> <br>
+                <br> I also welcome invitations to share knowledge through speaking, writing, or mentoring because the future of the cloud is stronger when we grow together.</p>
         </div>
     </section>
 
@@ -275,10 +284,14 @@
         <div class="newsletter-container">
             <h3>Stay Updated</h3>
             <p>Subscribe for cloud insights and latest articles</p>
-            <form class="newsletter-form">
-                <input type="email" placeholder="Enter your email" required>
+            <form class="newsletter-form" id="newsletter-form">
+                <input type="email" id="newsletter-email" placeholder="Enter your email" required>
                 <button type="submit">Subscribe</button>
             </form>
+            <div class="subscription-popup" id="subscription-popup">
+                <i class="fas fa-check-circle"></i>
+                <p>Subscribed!</p>
+            </div>
         </div>
     </section>
 
@@ -489,6 +502,37 @@
         function toggleMenu() {
             document.querySelector('.nav-links').classList.toggle('active');
         }
+
+        // Newsletter subscription handler
+        document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value;
+            
+            try {
+                // Send to Google Sheets (replace with your Google Apps Script URL)
+                await fetch('https://script.google.com/macros/s/AKfycbz9uguUlFTm2mJeYjTxSiuwSOU0X30bAkWbqI0VvFy2raxbNA7uJq2_LGJoJuN9o9lzeA/exec', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
+                });
+                
+                // Show success popup
+                const popup = document.getElementById('subscription-popup');
+                popup.classList.add('show');
+                
+                // Clear form
+                document.getElementById('newsletter-email').value = '';
+                
+                // Hide popup after 3 seconds
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
+                
+            } catch (error) {
+                alert('Subscription failed. Please try again.');
+            }
+        });
 
         // Load content when page loads
         document.addEventListener('DOMContentLoaded', function() {
