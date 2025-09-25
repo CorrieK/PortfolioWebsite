@@ -8,7 +8,7 @@ function doPost(e) {
     const timestamp = data.timestamp;
     
     // Open your Google Sheet (replace with your sheet ID)
-    const sheet = SpreadsheetApp.openById('YOUR_GOOGLE_SHEET_ID').getActiveSheet();
+    const sheet = SpreadsheetApp.openById('1xt2ANixX1xPiz74bnNxHUHX9wt5qcJgB--LkR9BJgBM').getActiveSheet();
     
     // Check if email already exists
     const emails = sheet.getRange('A:A').getValues().flat();
