@@ -736,80 +736,31 @@
         }
         
         // Newsletter subscription handler
-        try {
-            const newsletterForm = document.getElementById('newsletter-form');
-            if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
-                    try {
-                        e.preventDefault();
-                        const email = document.getElementById('newsletter-email').value.trim();
-                        
-                        // Validate email
-                        if (!validateEmail(email)) {
-                            alert('Please enter a valid email address.');
-                            return;
-                        }
-                        
-                        // Rate limiting
-                        const now = Date.now();
-                        if (now - lastSubmission < RATE_LIMIT) {
-                            alert('Please wait before submitting again.');
-                            return;
-                        }
-                        
-                        // CAPTCHA validation after 3 submissions
-                        if (submissionCount >= 3) {
-                            const captchaAnswer = parseInt(document.getElementById('captcha-input').value);
-                            if (isNaN(captchaAnswer) || captchaAnswer !== currentCaptcha) {
-                                alert('Please solve the math problem correctly.');
-                                generateCaptcha(); // Generate new CAPTCHA
-                                return;
-                            }
-                        }
-                        
-                        lastSubmission = now;
-                        submissionCount++;
-                        
-                        const controller = new AbortController();
-                        setTimeout(() => controller.abort(), 10000); // 10 second timeout
-                        
-                        // Send to Google Sheets using config
-                        await fetch(window.CONFIG.GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: email, timestamp: new Date().toISOString() }),
-                            signal: controller.signal
-                        });
-                        
-                        // Show success popup
-                        const popup = document.getElementById('subscription-popup');
-                        if (popup) {
-                            popup.classList.add('show');
-                            setTimeout(() => popup.classList.remove('show'), 3000);
-                        }
-                        
-                        // Clear form and CAPTCHA
-                        const emailInput = document.getElementById('newsletter-email');
-                        if (emailInput) emailInput.value = '';
-                        
-                        // Show CAPTCHA for next submission if needed
-                        if (submissionCount >= 3) {
-                            toggleCaptcha(true);
-                        } else if (submissionCount === 2) {
-                            // Show CAPTCHA before 3rd submission
-                            toggleCaptcha(true);
-                        }
-                        
-                    } catch (error) {
-                        console.error('Newsletter subscription error:', error);
-                        alert('Subscription failed. Please try again.');
-                    }
-                });
+        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value.trim();
+            
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
             }
-        } catch (error) {
-            console.error('Error setting up newsletter form:', error);
-        }
+            
+            // Show success popup immediately
+            const popup = document.getElementById('subscription-popup');
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 3000);
+            
+            // Clear form
+            document.getElementById('newsletter-email').value = '';
+            
+            // Send to Google Sheets in background
+            fetch(window.CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
+            }).catch(err => console.log('Background submission:', err));
+        });
 
         // Global error handler to prevent infinite loading
         window.addEventListener('error', function(e) {
