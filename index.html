@@ -407,7 +407,7 @@
                     <div class="captcha-question" id="captcha-question"></div>
                     <input type="number" id="captcha-input" class="captcha-input" placeholder="Answer" required>
                 </div>
-                <button type="submit">Subscribe</button>
+                <button type="submit" onclick="submitNewsletter(event)">Subscribe</button>
             </form>
             <p style="font-size: 0.8rem; color: #6c757d; margin-top: 0.5rem;">By subscribing, you agree to our <a href="#" onclick="showPrivacyModal()" style="color: #ff8c00; cursor: pointer;">Privacy Policy</a>. <br> We respect your privacy and won't spam you.</p>
             <div class="subscription-popup" id="subscription-popup">
@@ -735,32 +735,7 @@
             }
         }
         
-        // Newsletter subscription handler
-        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('newsletter-email').value.trim();
-            
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-            
-            // Show success popup immediately
-            const popup = document.getElementById('subscription-popup');
-            popup.classList.add('show');
-            setTimeout(() => popup.classList.remove('show'), 3000);
-            
-            // Clear form
-            document.getElementById('newsletter-email').value = '';
-            
-            // Send to Google Sheets in background
-            fetch(window.CONFIG.GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
-            }).catch(err => console.log('Background submission:', err));
-        });
+
 
         // Global error handler to prevent infinite loading
         window.addEventListener('error', function(e) {
@@ -793,6 +768,33 @@
         // Set dynamic copyright year
         document.getElementById('current-year').textContent = new Date().getFullYear();
         
+        // Newsletter function
+        function submitNewsletter(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value.trim();
+            
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Show success popup
+            const popup = document.getElementById('subscription-popup');
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 3000);
+            
+            // Clear form
+            document.getElementById('newsletter-email').value = '';
+            
+            // Send to Google Sheets
+            fetch(window.CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
+            }).catch(err => console.log('Submission error:', err));
+        }
+        
         // Initialize CAPTCHA state
         document.addEventListener('DOMContentLoaded', function() {
             // Check if we need to show CAPTCHA on page load
@@ -805,6 +807,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             try {
                 fetchMediumArticles();
+                
+                // Newsletter subscription handler
+                document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('newsletter-email').value.trim();
+                    
+                    if (!email || !email.includes('@')) {
+                        alert('Please enter a valid email address.');
+                        return;
+                    }
+                    
+                    // Show success popup immediately
+                    const popup = document.getElementById('subscription-popup');
+                    popup.classList.add('show');
+                    setTimeout(() => popup.classList.remove('show'), 3000);
+                    
+                    // Clear form
+                    document.getElementById('newsletter-email').value = '';
+                    
+                    // Send to Google Sheets in background
+                    fetch(window.CONFIG.GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
+                    }).catch(err => console.log('Background submission:', err));
+                });
+                
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
                 // Fallback: clear loading state
